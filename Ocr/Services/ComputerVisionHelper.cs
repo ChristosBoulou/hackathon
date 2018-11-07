@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Logging;
 
 namespace HackathonEq2018Ocr.Services
 {
@@ -18,24 +19,6 @@ namespace HackathonEq2018Ocr.Services
 
         const int numberOfCharsInOperationId = 36;
 
-        // Recognize text from a remote image
-        private static async Task ExtractRemoteTextAsync(this
-            ComputerVisionClient computerVision, string imageUrl)
-        {
-            if (!Uri.IsWellFormedUriString(imageUrl, UriKind.Absolute))
-            {
-                Console.WriteLine(
-                    "\nInvalid remoteImageUrl:\n{0} \n", imageUrl);
-                return;
-            }
-
-            // Start the async process to recognize the text
-            RecognizeTextHeaders textHeaders =
-                await computerVision.RecognizeTextAsync(
-                    imageUrl, textRecognitionMode);
-
-         //   await GetTextAsync(computerVision, textHeaders.OperationLocation);
-        }
 
         // Recognize text from a local image
         public static async Task<IList<Line>> ExtractLocalTextAsync(byte [] uploadedImage
@@ -52,28 +35,20 @@ namespace HackathonEq2018Ocr.Services
             {
                 using (Stream uploadedImageStream = new MemoryStream(uploadedImage))
                 {
-
-                   
                     // Start the async process to recognize the text
                     RecognizeTextInStreamHeaders textHeaders =
                       await computerVision.RecognizeTextInStreamAsync(
                                  uploadedImageStream, textRecognitionMode);
                                  
-                    /*               
-                    var remoteFile = "http://d2jaiao3zdxbzm.cloudfront.net/wp-content/uploads/figure-65.png";
-                    RecognizeTextHeaders textHeaders =
-                        await computerVision.RecognizeTextAsync(
-                            remoteFile, textRecognitionMode);
-        */
                    return await GetTextAsync(computerVision, textHeaders.OperationLocation);
                 }
             }
             catch(Exception ex)
             {
+               // logger.LogError(ex, "Problem getting text from computer vision " + ex.Message);
                 return new List<Line> { new Line(new List<int> { 0 }, "Error processing message") };
             }
 
-          //  return await GetTextAsync(computerVision, textHeaders.OperationLocation);
 
         }
 

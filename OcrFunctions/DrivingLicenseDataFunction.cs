@@ -29,10 +29,10 @@ namespace OcrFunctions
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Empty request body");
             }
 
-            var textResult = await ComputerVisionHelper.ExtractLocalTextAsync(byteArray);
+            var textResult = await ComputerVisionHelper.ExtractLocalTextAsync(byteArray, log);
             return req.CreateResponse(HttpStatusCode.OK, new DrivingLicenseDto
             {
-                Name = textResult.Any() ? textResult[0].Text : "Nothing came back"
+                Name = textResult != null && textResult.Any() ? textResult[0].Text : "Nothing came back"
             });
         }
     }

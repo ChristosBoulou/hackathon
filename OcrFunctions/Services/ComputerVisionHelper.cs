@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace OcrFunctions.Services
 {
@@ -38,7 +40,7 @@ namespace OcrFunctions.Services
         }
 
         // Recognize text from a local image
-        public static async Task<IList<Line>> ExtractLocalTextAsync(byte [] uploadedImage
+        public static async Task<IList<Line>> ExtractLocalTextAsync(byte [] uploadedImage, ILogger logger
              )
         {
             ComputerVisionClient computerVision = new ComputerVisionClient(
@@ -59,26 +61,21 @@ namespace OcrFunctions.Services
                       await computerVision.RecognizeTextInStreamAsync(
                                  uploadedImageStream, textRecognitionMode);
                                  
-                    /*               
-                    var remoteFile = "http://d2jaiao3zdxbzm.cloudfront.net/wp-content/uploads/figure-65.png";
-                    RecognizeTextHeaders textHeaders =
-                        await computerVision.RecognizeTextAsync(
-                            remoteFile, textRecognitionMode);
-        */
-                   return await GetTextAsync(computerVision, textHeaders.OperationLocation);
+                    return await GetTextAsync(computerVision, textHeaders.OperationLocation, logger);
                 }
             }
             catch(Exception ex)
             {
-                return new List<Line> { new Line(new List<int> { 0 }, "Error processing message") };
-            }
+                logger.LogError(ex, "Problem getting text from computer vision " + ex.Message);
 
-          //  return await GetTextAsync(computerVision, textHeaders.OperationLocation);
+
+            }
+            return null;
 
         }
 
         // Retrieve the recognized text
-        private static async Task<IList<Line>> GetTextAsync(ComputerVisionClient computerVision, string operationLocation)
+        private static async Task<IList<Line>> GetTextAsync(ComputerVisionClient computerVision, string operationLocation, ILogger logger)
         {
             
 
@@ -97,16 +94,24 @@ namespace OcrFunctions.Services
             while ((result.Status == TextOperationStatusCodes.Running ||
                     result.Status == TextOperationStatusCodes.NotStarted) && i++ < maxRetries)
             {
-                Console.WriteLine(
-                    "Server status: {0}, waiting {1} seconds...", result.Status, i);
-                await Task.Delay(200);
+                logger.LogInformation(
+                    $"Server status: {result.Status}, waiting {i * 500} milliseconds...");
+                await Task.Delay(500);
 
                 result = await computerVision.GetTextOperationResultAsync(operationId);
             }
 
             // Display the results
-            var lines = result.RecognitionResult.Lines;
-            return lines;
+            if (result.RecognitionResult != null && result.RecognitionResult.Lines != null)
+            {
+                var lines = result.RecognitionResult.Lines;
+                return lines;
+            }
+            else
+            {
+                logger.LogError($"Unable to get text operation result: {JsonConvert.SerializeObject(result)}");
+                return null;
+            }
         }
     }
     }
