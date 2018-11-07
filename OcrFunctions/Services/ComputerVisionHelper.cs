@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
-namespace HackathonEq2018Ocr.Services
+namespace OcrFunctions.Services
 {
     public static class ComputerVisionHelper
     {

@@ -7,7 +7,7 @@ namespace HackathonEq2018Ocr.Models
         {
         }
 
-        public int FileSize { get; set; }
+        public long FileSize { get; set; }
         public string FileName { get; set; }
         public string FileText { get; set; }
     }

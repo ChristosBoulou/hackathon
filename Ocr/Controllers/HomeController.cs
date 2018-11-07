@@ -23,31 +23,32 @@ namespace HackathonEq2018Ocr.Controllers
         public async Task<IActionResult> Index(List<IFormFile> file)
         {
             long size = file.Sum(f => f.Length);
-            MemoryStream memoryStream = new MemoryStream();
+
+
             if(file.Any())
             {
-                file[0].CopyTo(memoryStream);
                 return View("Result", new UploadResultViewModel {
-                    FileSize = memoryStream.Capacity,
+                    FileSize = file[0].Length,
                     FileName = file[0].FileName,
-                    FileText = await GetFileText(memoryStream)
+                    FileText = await GetFileText(file[0])
                 });
 
             }
             return View();
         }
 
-        private async Task<string> GetFileText(Stream fileStream)
+        private async Task<string> GetFileText(IFormFile file)
         {
-            var lines = await ComputerVisionHelper.ExtractLocalTextAsync(fileStream);
-            return string.Join(" - ", lines.Select(t => t.Text));
 
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                var fileBytes = ms.ToArray();
+                var lines = await ComputerVisionHelper.ExtractLocalTextAsync(fileBytes);
+                return string.Join(" - ", lines.Select(t => t.Text));
 
-
+            }
         }
-
-
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
