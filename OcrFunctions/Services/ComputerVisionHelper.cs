@@ -95,8 +95,8 @@ namespace OcrFunctions.Services
                     result.Status == TextOperationStatusCodes.NotStarted) && i++ < maxRetries)
             {
                 logger.LogInformation(
-                    $"Server status: {result.Status}, waiting {i * 500} milliseconds...");
-                await Task.Delay(500);
+                    $"Server status: {result.Status}, waiting {i * 1000} milliseconds...");
+                await Task.Delay(1000);
 
                 result = await computerVision.GetTextOperationResultAsync(operationId);
             }

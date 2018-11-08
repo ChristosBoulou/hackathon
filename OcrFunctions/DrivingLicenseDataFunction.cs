@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using OcrFunctions.Dtos;
 using OcrFunctions.Services;
 
@@ -26,14 +28,20 @@ namespace OcrFunctions
             Byte[] byteArray = await req.Content.ReadAsByteArrayAsync();
             if (byteArray == null || byteArray.Length == 0)
             {
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Empty request body");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(@"Empty request body") };
             }
 
             var textResult = await ComputerVisionHelper.ExtractLocalTextAsync(byteArray, log);
-            return req.CreateResponse(HttpStatusCode.OK, new DrivingLicenseDto
+
+            if(textResult == null || !textResult.Any())
             {
-                Name = textResult != null && textResult.Any() ? textResult[0].Text : "Nothing came back"
-            });
+                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(@"No text found") };
+
+
+            }
+            var license = textResult.Select(tr => tr.Text).ToList().ExtractDrivingInfo();
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(license), Encoding.UTF8, "application/json") };
+
         }
     }
 }
