@@ -20,7 +20,29 @@ namespace OcrFunctions.Services
 
             return new Coordinates(allCoordinates.Select(co => co.X).Max(), allCoordinates.Select(co => co.Y).Max());
         }
+
+        public static Tuple<bool, bool> IsWithinThisPercentage(Line line, Coordinates maxCoordinates, int maxXPercentage, int maxYPercentage)
+        {
+            var topRightCoordinates = new Coordinates(line.BoundingBox[3], line.BoundingBox[4]);
+            var BottomRightCoordinates = new Coordinates(line.BoundingBox[5], line.BoundingBox[6]);
+
+            bool withinX = false;
+            if (topRightCoordinates.X/ maxCoordinates.X <= (maxXPercentage/ 100))
+            {
+                withinX = true;
+            }
+
+            bool withinY = false;
+            if (topRightCoordinates.Y / maxCoordinates.Y <= (maxYPercentage / 100))
+            {
+                withinY = true;
+            }
+
+            return new Tuple<bool, bool>(withinX, withinY);
+        }
     }
+
+
 
     public class Coordinates 
     {
