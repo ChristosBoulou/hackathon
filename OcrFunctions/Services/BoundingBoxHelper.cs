@@ -24,7 +24,7 @@ namespace OcrFunctions.Services
         public static Tuple<bool, bool> IsWithinThisPercentage(Line line, Coordinates maxCoordinates, int maxXPercentage, int maxYPercentage)
         {
             var topRightCoordinates = new Coordinates(line.BoundingBox[3], line.BoundingBox[4]);
-            var BottomRightCoordinates = new Coordinates(line.BoundingBox[5], line.BoundingBox[6]);
+            var bottomRightCoordinates = new Coordinates(line.BoundingBox[5], line.BoundingBox[6]);
 
             bool withinX = false;
             if (topRightCoordinates.X/ maxCoordinates.X <= (maxXPercentage/ 100))
@@ -33,7 +33,7 @@ namespace OcrFunctions.Services
             }
 
             bool withinY = false;
-            if (topRightCoordinates.Y / maxCoordinates.Y <= (maxYPercentage / 100))
+            if (bottomRightCoordinates.Y / maxCoordinates.Y <= (maxYPercentage / 100))
             {
                 withinY = true;
             }
