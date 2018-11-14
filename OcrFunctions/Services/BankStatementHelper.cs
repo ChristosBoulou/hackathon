@@ -34,10 +34,37 @@ namespace OcrFunctions.Services
 
             BankStatementDto bankStatement = new BankStatementDto
             {
-                Raw = companyInfoLines
+                CompanyName = companyInfoLines[0].Text,
+                AddressLine1 = companyInfoLines[1].Text,
+                AddressLine2 = companyInfoLines[2].Text,
+                AddressLine3 = companyInfoLines[3].Text,
+                PostCode = companyInfoLines[4].Text,
+                CompanyType = GetCompanyType(companyInfoLines[0].Text),
+                AccountProvider = lines.First().Text,
+                Raw = lines.Select( x=> x.Text).ToList()
 
             };
             return bankStatement;
+        }
+
+        public static string GetCompanyType( this string companyName)
+        {
+            var companyType = String.Empty;
+            var formattedCompanyName = companyName.ToUpper();
+            if(formattedCompanyName.Contains("LTD"))
+            {
+                companyType = "Private Limited Company";
+            }
+            else if(formattedCompanyName.Contains("PLC"))
+            {
+                companyType = "Public Limited Company";
+            }
+            else 
+            {
+                companyType = "Sole trader";
+            }
+
+            return companyType;
         }
 
     }

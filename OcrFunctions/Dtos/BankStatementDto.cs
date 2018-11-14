@@ -16,6 +16,6 @@ namespace OcrFunctions.Dtos
         public string PostCode { get; set; }
         public string CompanyType { get; set; }
         public string AccountProvider { get; set; }
-        public List<Line> Raw { get; set; }
+        public List<string> Raw { get; set; }
     }
 }
