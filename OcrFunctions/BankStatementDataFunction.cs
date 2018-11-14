@@ -40,7 +40,7 @@ namespace OcrFunctions
 
             }
             // that needs to change to the bank statement thing 
-            var bankstatement = textResult.Select(tr => tr.Text).ToList().ExtractBankStatementInfo();
+            var bankstatement = textResult.ToList().ExtractBankStatementInfo();
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(bankstatement), Encoding.UTF8, "application/json") };
 
         }

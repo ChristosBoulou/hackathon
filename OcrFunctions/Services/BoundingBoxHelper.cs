@@ -7,7 +7,7 @@ namespace OcrFunctions.Services
 {
     public static class BoundingBoxHelper
     {
-        public static Coordinates GetMaxXandY(List<Line> lines)
+        public static Coordinates GetMaxXandY(this List<Line> lines)
         {
             List<Coordinates> allCoordinates = new List<Coordinates>();
             foreach(var line in lines)
@@ -23,17 +23,17 @@ namespace OcrFunctions.Services
 
         public static Tuple<bool, bool> IsWithinThisPercentage(Line line, Coordinates maxCoordinates, int maxXPercentage, int maxYPercentage)
         {
-            var topRightCoordinates = new Coordinates(line.BoundingBox[3], line.BoundingBox[4]);
-            var bottomRightCoordinates = new Coordinates(line.BoundingBox[5], line.BoundingBox[6]);
+            var topRightCoordinates = new Coordinates(line.BoundingBox[2], line.BoundingBox[3]);
+            var bottomRightCoordinates = new Coordinates(line.BoundingBox[4], line.BoundingBox[5]);
 
             bool withinX = false;
-            if (topRightCoordinates.X/ maxCoordinates.X <= (maxXPercentage/ 100))
+            if ((topRightCoordinates.X/(double) maxCoordinates.X) <= (maxXPercentage/ (double)100))
             {
                 withinX = true;
             }
 
             bool withinY = false;
-            if (bottomRightCoordinates.Y / maxCoordinates.Y <= (maxYPercentage / 100))
+            if ((bottomRightCoordinates.Y /(double) maxCoordinates.Y) <= (maxYPercentage /(double) 100))
             {
                 withinY = true;
             }
